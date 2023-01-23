@@ -1,10 +1,9 @@
 import { XMLParser } from 'fast-xml-parser';
-import sanitizeHtml from 'sanitize-html';
-import { IFrame } from "sanitize-html";
-import { parseDocument } from "htmlparser2";
-import { findAll, getAttributeValue, textContent } from "domutils";
+import sanitizeHtml, { IFrame } from 'sanitize-html';
+import { parseDocument } from 'htmlparser2';
+import { findAll, getAttributeValue, textContent } from 'domutils';
 
-import { SectionResponse, WikiApi } from "./wikiApi.js";
+import { PageInfo, SectionResponse, WikiApi } from './wikiApi.js';
 
 export interface TalkMetadata {
   id: string;
@@ -15,11 +14,16 @@ export interface TalkMetadata {
 }
 
 export interface EventMetadata {
-  title: string,
-  date: string,
-  start: string,
-  hosts: string[],
-  talks: TalkMetadata[],
+  href: string;
+  title: string;
+  date: string;
+  start: string;
+  hosts: string[];
+}
+
+export interface Metadata {
+  event: EventMetadata;
+  talks: TalkMetadata[];
 }
 
 type XMLElement = string | XMLElement[] | { [key: string]: XMLElement }
@@ -33,7 +37,22 @@ export class EventExtractor {
     this.parser = new XMLParser();
   }
 
-  private async extractEventMetadata(id: string): Promise<{ [key: string]: string }> {
+  private async extractPageMetadata(title: string): Promise<PageInfo> {
+    const response = await this.api.getPageMetadata(title);
+    const pages = Object.values(response.query.pages ?? {});
+    if (pages.length > 1) {
+      console.debug("Found multiple pages with the same title", title, JSON.stringify(pages, null, 2));
+      throw new Error(`Found multiple pages with the same title: "${title}"`);
+    }
+    if (pages.length < 1 || !pages[0]) {
+      console.debug("Found no pages with the given title", title, JSON.stringify(pages, null, 2));
+      throw new Error(`Found no pages with the given title: "${title}"`);
+    }
+
+    return pages[0];
+  }
+
+  private async extractEventMetadata(id: number): Promise<{ [key: string]: string }> {
     const response = await this.api.parsePage(id, "parsetree", {});
     try {
       const content = response.parse.parsetree["*"];
@@ -61,7 +80,7 @@ export class EventExtractor {
     return nodes.map(el => textContent(el));
   }
 
-  private async extractTalkMetadata(id: string, section: SectionResponse): Promise<TalkMetadata> {
+  private async extractTalkMetadata(id: number, section: SectionResponse): Promise<TalkMetadata> {
     const response = await this.api.parsePage(id, "text", { section: section.index });
     try {
       const html = response.parse.text["*"];
@@ -83,7 +102,7 @@ export class EventExtractor {
     }
   }
 
-  private async extractTalks(id: string): Promise<TalkMetadata[]> {
+  private async extractTalks(id: number): Promise<TalkMetadata[]> {
     const response = await this.api.parsePage(id, "sections", {});
     try {
       const sections = response.parse.sections;
@@ -102,22 +121,27 @@ export class EventExtractor {
       ?? [];
   }
 
-  async extractEvent(id: string): Promise<EventMetadata> {
+  async extractEvent(title: string): Promise<Metadata> {
     try {
+      const info = await this.extractPageMetadata(title);
+
       const [metadata, sections] = await Promise.all([
-        this.extractEventMetadata(id),
-        this.extractTalks(id)
-      ])
+        this.extractEventMetadata(info.pageid),
+        this.extractTalks(info.pageid),
+      ]);
 
       return {
-        title: metadata.Title.trim(),
-        date: metadata.Date.trim(),
-        start: metadata.Start.trim(),
-        hosts: this.parseHosts(metadata.Host),
+        event: {
+          href: info.canonicalurl,
+          title: metadata.Title.trim(),
+          date: metadata.Date.trim(),
+          start: metadata.Start.trim(),
+          hosts: this.parseHosts(metadata.Host),
+        },
         talks: sections,
       };
     } catch (e) {
-      throw new Error(`Could not extract ${id}: ${e}`);
+      throw new Error(`Could not extract ${title}: ${e}`);
     }
   }
 }
