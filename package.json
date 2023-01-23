@@ -4,6 +4,8 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
+    "start": "npm run build && node dist/index.js",
+    "build": "node_modules/typescript/bin/tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "license": "GPLv3",

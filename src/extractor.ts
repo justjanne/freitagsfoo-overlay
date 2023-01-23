@@ -18,7 +18,7 @@ export interface EventMetadata {
   title: string,
   date: string,
   start: string,
-  host: string,
+  hosts: string[],
   talks: TalkMetadata[],
 }
 
@@ -94,6 +94,14 @@ export class EventExtractor {
     }
   }
 
+  private parseHosts(host: string): string[] {
+    return host?.split(",")
+      ?.map(it => it.trim().toLowerCase())
+      ?.filter(it => it !== "fixme")
+      ?.filter(it => it !== "")
+      ?? [];
+  }
+
   async extractEvent(id: string): Promise<EventMetadata> {
     try {
       const [metadata, sections] = await Promise.all([
@@ -102,10 +110,10 @@ export class EventExtractor {
       ])
 
       return {
-        title: metadata.Title,
-        date: metadata.Date,
-        start: metadata.Start,
-        host: metadata.Host,
+        title: metadata.Title.trim(),
+        date: metadata.Date.trim(),
+        start: metadata.Start.trim(),
+        hosts: this.parseHosts(metadata.Host),
         talks: sections,
       };
     } catch (e) {
