@@ -1,0 +1,115 @@
+.view {
+  aspect-ratio: 16 / 9;
+
+  background: #000;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+
+  font-family: "CP Mono";
+
+  box-shadow: 0 0 4px #000;
+
+  * {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+.intro {
+  header {
+    flex: 1;
+    margin: 2rem;
+
+    code {
+      color: #fff;
+      font-family: "Computerfont";
+      white-space: pre;
+      font-size: 3rem;
+    }
+  }
+
+  footer {
+    margin-top: auto;
+    background: #fff;
+    display: flex;
+    flex-direction: row;
+    flex-basis: 9rem;
+    align-items: center;
+    padding: 0 2rem;
+
+    h1 {
+      flex: 1;
+      font-family: "Computerfont";
+      font-size: 5rem;
+    }
+
+    aside {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+}
+
+.talk, .list {
+  header {
+    background: #fff;
+    display: flex;
+    flex-direction: row;
+    font-family: "Computerfont";
+    flex-basis: 7rem;
+    align-items: center;
+    padding: 0 2rem;
+
+    h1 {
+      flex: 1;
+      font-size: 4rem;
+    }
+  }
+
+  a {
+    color: #fff;
+    text-decoration: none;
+  }
+
+  ul {
+    flex: 1;
+    padding: 1rem;
+    list-style: none;
+    color: #fff;
+
+    li {
+      margin: 0.8rem 0;
+
+      .title {
+        font-size: 1.4rem;
+        margin: 0.4rem 0;
+      }
+
+      .presenter {
+        font-size: 1.2rem;
+        margin: 0.4rem 0;
+      }
+    }
+  }
+
+  .talk {
+    padding: 1rem;
+    color: #fff;
+
+    .title {
+      font-size: 1.4rem;
+      margin: 0.4rem 0;
+    }
+
+    .presenter {
+      font-size: 1.2rem;
+      margin: 0.4rem 0;
+    }
+
+    .content {
+      font-size: 1.2rem;
+      margin: 0.4rem 0;
+    }
+  }
+}

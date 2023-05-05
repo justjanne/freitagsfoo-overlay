@@ -1,0 +1,49 @@
+.dock {
+  background: #000;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  font-size: 18px;
+  height: 100vh;
+  overflow-x: hidden;
+
+  * {
+    margin: 0;
+    padding: 0;
+  }
+
+  input {
+    margin: 8px;
+    padding: 8px;
+    font-size: 18px;
+
+    border: 1px solid #fff;
+    color: #fff;
+    background: transparent;
+  }
+
+  .status {
+    color: #fff;
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+      list-style: none;
+      margin: 8px;
+      padding: 8px;
+
+      border: 1px solid #fff;
+      color: #fff;
+      cursor: pointer;
+      user-select: none;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    }
+  }
+}
