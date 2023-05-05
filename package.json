@@ -2,7 +2,7 @@
   "name": "freitagsfoo-service",
   "version": "1.0.0",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/service.js",
   "scripts": {
     "start": "npm run build && node dist/service.js",
     "build": "node_modules/typescript/bin/tsc",

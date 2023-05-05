@@ -104,6 +104,7 @@ export class EventExtractor {
 
   private async extractTalks(id: number): Promise<TalkMetadata[]> {
     const response = await this.api.parsePage(id, "sections", {});
+    console.log(response);
     try {
       const sections = response.parse.sections;
       return await Promise.all(sections.map(section => this.extractTalkMetadata(id, section)));
@@ -121,9 +122,12 @@ export class EventExtractor {
       ?? [];
   }
 
-  async extractEvent(title: string): Promise<Metadata> {
+  async extractEvent(title: string): Promise<Metadata | null> {
     try {
       const info = await this.extractPageMetadata(title);
+      if (!info.pageid) {
+        return null;
+      }
 
       const [metadata, sections] = await Promise.all([
         this.extractEventMetadata(info.pageid),
